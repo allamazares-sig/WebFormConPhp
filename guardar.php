@@ -2,7 +2,7 @@
 // Parámetros de conexión (ajusta los valores)
 $server = "tcp:phpdbconcepto.database.windows.net,1433";
 $database = "testtconceptobd";
-$username = "admintest";
+$username = "admintest@phpdbconcepto";
 $password = "Teamcoder!";
 
 try {
