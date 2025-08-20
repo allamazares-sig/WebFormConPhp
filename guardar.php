@@ -1,36 +1,35 @@
 <?php
-// Parámetros de conexión (ajusta los valores)
-$server = "tcp:phpdbconcepto.database.windows.net,1433";
-$database = "testtconceptobd";
-$username = "admintest@phpdbconcepto";
-$password = "Teamcoder!";
+// Parámetros de conexión (ajusta los valores según tu servidor y BD)
+$serverName = "phpdbconcepto.database.windows.net"; // tu servidor en Azure
+$connectionOptions = array(
+    "Database" => "testtconceptobd", // tu base de datos
+    "Uid" => "admintest",            // tu usuario
+    "PWD" => "Teamcoder!"            // tu contraseña
+);
 
-try {
-    // Conexión PDO
-    $conn = new PDO("sqlsrv:server=$server;Database=$database", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Establece la conexión
+$conn = sqlsrv_connect($serverName, $connectionOptions);
 
-    // Crear la tabla si no existe
-    $createTableSql = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'usuarios')
-        CREATE TABLE usuarios (
-            id INT IDENTITY(1,1) PRIMARY KEY,
-            nombre NVARCHAR(100),
-            email NVARCHAR(100)
-        );";
-    $conn->exec($createTableSql);
-
-    // Procesar formulario POST
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $nombre = $_POST["nombre"] ?? '';
-        $email = $_POST["email"] ?? '';
-
-        // Insertar registro
-        $insertSql = "INSERT INTO usuarios (nombre, email) VALUES (?, ?)";
-        $stmt = $conn->prepare($insertSql);
-        $stmt->execute([$nombre, $email]);
-        echo "¡Datos guardados en la base de datos!";
-    }
-} catch (PDOException $e) {
-    echo "Error de conexión o consulta: " . $e->getMessage();
+if ($conn === false) {
+    // Mostrar errores en caso de fallo
+    die(print_r(sqlsrv_errors(), true));
 }
+
+// Prueba simple de consulta
+$tsql = "SELECT TOP 5 * FROM INFORMATION_SCHEMA.TABLES";
+$getResults = sqlsrv_query($conn, $tsql);
+
+if ($getResults == FALSE) {
+    echo (sqlsrv_errors());
+} else {
+    echo ("Leyendo tablas de INFORMATION_SCHEMA" . PHP_EOL);
+    while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
+        echo ($row['TABLE_NAME'] . PHP_EOL);
+    }
+    sqlsrv_free_stmt($getResults);
+}
+
+// Cerrar conexión
+sqlsrv_close($conn);
 ?>
+
