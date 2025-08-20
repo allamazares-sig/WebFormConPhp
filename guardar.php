@@ -15,18 +15,38 @@ if ($conn === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-// Prueba simple de consulta
-$tsql = "SELECT TOP 5 * FROM INFORMATION_SCHEMA.TABLES";
-$getResults = sqlsrv_query($conn, $tsql);
+// Crea la tabla si no existe
+$createTableSql = "
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='usuarios' AND xtype='U')
+CREATE TABLE usuarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100),
+    email NVARCHAR(100)
+);
+";
+$stmt = sqlsrv_query($conn, $createTableSql);
+if ($stmt === false) {
+    die("Error al crear la tabla: " . print_r(sqlsrv_errors(), true));
+}
 
-if ($getResults == FALSE) {
-    echo (sqlsrv_errors());
-} else {
-    echo ("Leyendo tablas de INFORMATION_SCHEMA" . PHP_EOL);
-    while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
-        echo ($row['TABLE_NAME'] . PHP_EOL);
+// Procesa el formulario POST
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nombre = $_POST["nombre"] ?? '';
+    $email = $_POST["email"] ?? '';
+
+    // Valida que los campos no estén vacíos
+    if ($nombre && $email) {
+        $insertSql = "INSERT INTO usuarios (nombre, email) VALUES (?, ?)";
+        $params = array($nombre, $email);
+        $stmt = sqlsrv_query($conn, $insertSql, $params);
+        if ($stmt) {
+            echo "¡Datos guardados en la base de datos!";
+        } else {
+            echo "Error al guardar los datos: " . print_r(sqlsrv_errors(), true);
+        }
+    } else {
+        echo "Por favor, completa ambos campos.";
     }
-    sqlsrv_free_stmt($getResults);
 }
 
 // Cerrar conexión
