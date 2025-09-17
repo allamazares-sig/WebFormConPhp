@@ -1,10 +1,10 @@
 <?php
 // Parámetros de conexión (ajusta los valores según tu servidor y BD)
-$serverName = "phpdbconcepto.database.windows.net"; // tu servidor en Azure
+$serverName = "bdteamcoderless.mysql.database.azure.com"; // tu servidor en Azure
 $connectionOptions = array(
     "Database" => "testtconceptobd", // tu base de datos
-    "Uid" => "admintest",            // tu usuario
-    "PWD" => "Teamcoder!"            // tu contraseña
+    "Uid" => "sigesa",            // tu usuario
+    "PWD" => "3m3ev%^hqJ26bq*8dPve"            // tu contraseña
 );
 
 // Establece la conexión
