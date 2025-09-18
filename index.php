@@ -5,7 +5,7 @@
     <title>Formulario Alta Usuario</title>
 </head>
 <body>
-    <form method="post" action="guardar.php">
+    <form method="post" action="/guardar.php">
         <label for="nombre">Nombre:</label>
         <input type="text" name="nombre" required><br>
         <label for="email">Email:</label>
